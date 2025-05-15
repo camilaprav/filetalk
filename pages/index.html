@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script type="module" src="../webfoundry/head.js"></script>
+    <style class="wf-scrollbar-style">
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+        box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: grey;
+        border-radius: 4px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: #b0b0b0;
+      }
+      ::-webkit-scrollbar-thumb:horizontal {
+        background-clip: padding-box;
+      }
+      ::-webkit-scrollbar-thumb:vertical {
+        background-clip: padding-box;
+      }
+    </style>
+  </head>
+  <body
+    style="display: none; min-height: 100vh"
+    class="tw flex! bg-gray-50 flex-col gap-12"
+  >
+    <div
+      wf-if="state.filechat.view === 'upload' &amp;&amp; !state.filechat.uploadProgress"
+      class="tw flex-1 justify-center items-center flex"
+    >
+      <button
+        wf-onclick="post('filechat.upload')"
+        class="tw outline-none group cursor-pointer p-32"
+      >
+        <div class="tw relative inline-block">
+          <div
+            class="tw nf nf-fa-cloud_upload text-7xl relative z-10 text-purple-400 duration-300 ease-out group-hover:-translate-y-4 group-hover:scale-110 group-hover:text-purple-500 transition-all active:text-pink-400"
+          ></div>
+          <div
+            class="tw nf nf-fa-plus text-xs text-pink-300 absolute top-20 left-20 transition-all duration-500 ease-out group-hover:-translate-y-8 group-hover:rotate-372 group-hover:translate-x-8 group-hover:animate-bounce"
+          ></div>
+          <div
+            class="tw nf nf-fa-plus text-sm text-blue-300 absolute top-2 right-20 transition-all duration-500 ease-out group-hover:-translate-y-10 group-hover:-rotate-366 group-hover:-translate-x-10 group-hover:animate-bounce"
+          ></div>
+          <div
+            class="tw nf nf-fa-plus text-xs text-yellow-300 absolute bottom-20 right-24 transition-all duration-500 ease-out group-hover:translate-x-6 group-hover:-translate-y-20 group-hover:rotate-366 group-hover:animate-bounce"
+          ></div>
+          <div
+            class="tw nf nf-fa-plus text-sm text-gray-400 absolute bottom-16 left-14 transition-all duration-500 ease-out group-hover:-translate-y-10 group-hover:translate-x-10 group-hover:-rotate-372 group-hover:animate-bounce"
+          ></div>
+        </div>
+      </button>
+      <button
+        class="tw px-6 py-2 rounded-md bg-purple-400 text-white fixed right-10 top-10 hover:bg-pink-400 shadow-md hover:shadow-lg transition-all text-sm outline-none"
+        wf-if="state.filechat.list.length"
+      >
+        Dashboard
+      </button>
+    </div>
+    <div
+      class="tw flex justify-center items-center flex-col gap-6 flex-1"
+      wf-if="state.filechat.view === 'upload' &amp;&amp; state.filechat.uploadProgress"
+    >
+      <div class="w-96 tw rounded-full overflow-hidden bg-gray-200 h-3">
+        <div
+          class="w-32 tw bg-purple-500 h-full min-h-0! transition-all duration-2000"
+          wf-class="{{replaces w-32: `w-[${state.filechat.uploadProgress}%]`}} {{replaces bg-purple-500 duration-2000: state.filechat.uploadProgress < 100 ? 'bg-purple-500 duration-2000' : 'bg-pink-400'}}"
+        ></div>
+      </div>
+
+      <div
+        wf-class="{{replaces text-purple-600: state.filechat.uploadProgress < 100 ? 'text-purple-600' : 'text-pink-400'}}"
+        class="text-sm text-purple-600 tw transition-colors"
+      >
+        {{state.filechat.uploadProgress &lt; 100 ? 'Uploading...' : 'Done!'}}
+      </div>
+    </div>
+    <div
+      class="tw flex flex-1 flex-col min-h-96"
+      wf-if="state.filechat.view === 'dashboard'"
+    >
+      <div class="bu navbar tw border-b border-black/10 gap-2! bg-purple-400">
+        <div class="bu navbar-brand wf-autogen">
+          <div class="bu navbar-item">
+            <span class="tw font-bold tracking-widest text-white pl-2"
+              >File Chat</span
+            >
+          </div>
+          <div class="bu navbar-burger wf-autogen">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="bu navbar-menu">
+          <div class="bu navbar-start">
+            <a
+              class="bu navbar-item tw bg-purple-600/20! hover:bg-purple-600/40! active:bg-purple-600/70!"
+            >
+              <span class="tw text-white">Explore</span>
+            </a>
+            <a class="bu navbar-item wf-autogen">
+              <span class="tw text-white">Archive</span>
+            </a>
+            <a class="bu navbar-item wf-autogen">
+              <span class="tw text-white">Upload New</span>
+            </a>
+          </div>
+          <div class="bu navbar-end">
+            <a class="bu navbar-item wf-autogen">
+              <span class="tw text-white px-2">Settings</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="tw flex-1 flex">
+        <div></div>
+        <div
+          class="w-72 tw bg-gray-100 border-r border-black/10 p-4 flex flex-col gap-2 text-purple-600"
+        >
+          <a
+            href="#"
+            class="tw flex items-center rounded outline-none py-1 justify-between px-2 ml-[0rem] transition-colors hover:text-purple-600 gap-1.5 bg-gray-200/50 hover:bg-gray-200"
+            wf-map="x of state.filechat.list"
+            wf-onclick="post('filechat.select', x)"
+          >
+            <div class="tw max-w-[calc(100%_-_5rem)] flex items-center gap-1.5">
+              <div class="tw nf p-2 nf-fa-file"></div>
+              <div class="tw FilesPanel-fileName overflow-hidden text-ellipsis">
+                {{x}}
+              </div>
+            </div>
+            <div class="tw flex">
+              <button
+                class="tw outline-none nf p-2 nf-fa-pencil"
+                wf-onclick="post('filechat.rename', event, x))"
+              ></button
+              ><button
+                class="tw outline-none nf p-2 nf-fa-trash"
+                wf-onclick="post('filechat.rm', event, x))"
+              ></button>
+            </div>
+          </a>
+        </div>
+        <div class="flex-1 tw"></div>
+      </div>
+    </div>
+  </body>
+</html>
