@@ -129,7 +129,7 @@ export default class Filetalk {
           let img = d.el('img', { src: await post('filetalk.load', x) });
           canvas.innerHTML = '';
           canvas.append(img);
-          panzoom(img);
+          this.state.panzoom = panzoom(img);
           break;
         }
 
@@ -178,10 +178,10 @@ export default class Filetalk {
       },
       handler: async ({ prompt }) => {
         if (!this.state.mime?.startsWith('image/'))
-          return tap({
+          return {
             success: false,
             error: `The open file is not an image`,
-          });
+          };
         try {
           this.state.loading++;
           d.update();
@@ -225,10 +225,10 @@ export default class Filetalk {
       },
       handler: async ({ prompt }) => {
         if (!this.state.mime?.startsWith('video/'))
-          return tap({
+          return {
             success: false,
             error: `The open file is not a video`,
-          });
+          };
         try {
           this.state.loading++;
           d.update();
