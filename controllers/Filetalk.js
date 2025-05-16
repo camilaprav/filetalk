@@ -15,7 +15,6 @@ export default class Filetalk {
     openMenu: false,
     openList: true,
     autoassist: false,
-    watchLogs: {},
 
     get media() {
       return /^image|audio|video\//.test(this.mime) && this.current;
@@ -29,7 +28,6 @@ export default class Filetalk {
         'filetalk.changeView',
         this.state.list.length ? 'dashboard' : 'upload',
       );
-      await post('filetalk.watcher');
     },
 
     upload: async () => {
@@ -102,7 +100,7 @@ export default class Filetalk {
             {
               main: `You're File Chat, a service for talking to AI about any file type.`,
               images: `When asked about an open image, use imagePrompt function to get it sent to OpenAI for analysis.`,
-              videos: `When asked about an open video, your instructions as they should contain scene descriptions.`,
+              videos: `When asked about an open video, use videoPrompt function similarly to query the current frame.`,
             },
             this.fns,
           );
@@ -166,40 +164,6 @@ export default class Filetalk {
       await post('filetalk.list');
       if (!this.state.list.length) await post('filetalk.changeView', 'upload');
     },
-
-    watcher: async () => {
-      let vid = document.querySelector('video');
-      let timeout = ms => setTimeout(async () => await post('filetalk.watcher'), ms);
-      if (!this.state.session || !vid || vid.paused) return timeout(500);
-      try {
-        let prev = [...Object.entries(this.state.watchLogs)].map(([k, v]) => `${k}: ${v}`);
-        let res = await completion([{
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: [
-                `File name: ${this.state.current}`,
-                `Previous timestampped scene descriptions:`,
-                ...(prev.length ? prev : ['None yet.']),
-                `Describe the video scene.`,
-              ].join('\n'),
-            },
-            {
-              type: 'image_url',
-              image_url: { url: await b64frame(vid, 1024) },
-            },
-          ],
-        }], {
-          endpoint:
-            'https://kittygpt.netlify.app/.netlify/functions/completion',
-        });
-        this.state.watchLogs[`@${vid.currentTime}`] = res.content;
-        this.state.session?.sysupdate?.(this.state.watchLogs);
-      } finally {
-        timeout(1500);
-      }
-    },
   };
 
   fns = {
@@ -239,7 +203,7 @@ export default class Filetalk {
                 'https://kittygpt.netlify.app/.netlify/functions/completion',
             },
           );
-          return { success: true, analysis: [res.content] };
+          return { success: true, analysis: res.content };
         } catch (err) {
           console.error(err);
           return { success: false, error: err.message };
@@ -251,7 +215,7 @@ export default class Filetalk {
     },
 
     videoPrompt: {
-      description: `Only use to get a most-recent description of the current video frame`,
+      description: `Don't worry about whether or which image has been selected, call this when asked`,
       parameters: {
         type: 'object',
         properties: {
@@ -268,7 +232,7 @@ export default class Filetalk {
         try {
           this.state.loading++;
           d.update();
-          let uri = b64frame(document.querySelector('video'));
+          let uri = b64frame(document.querySelector('video'), 1920);
           if ((uri.length > 4 * 1024) & 1024)
             return { success: false, error: `Frame too large for analysis` };
           let res = await completion(
@@ -284,10 +248,9 @@ export default class Filetalk {
             {
               endpoint:
                 'https://kittygpt.netlify.app/.netlify/functions/completion',
-              model: 'gpt-4.1',
             },
           );
-          return { success: true, analysis: [res.content] };
+          return { success: true, analysis: res.content };
         } catch (err) {
           console.error(err);
           return { success: false, error: err.message };
