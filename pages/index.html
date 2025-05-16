@@ -2,6 +2,10 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
     <script type="module" src="../webfoundry/head.js"></script>
     <style class="wf-scrollbar-style">
       ::-webkit-scrollbar {
@@ -31,16 +35,16 @@
     </style>
   </head>
   <body
-    wf-onattach="post('filechat.init')"
+    wf-onattach="post('filetalk.init')"
     style="display: none; min-height: 100vh"
     class="tw flex! bg-gray-50 flex-col gap-12"
   >
     <div
-      wf-if="state.filechat.view === 'upload' &amp;&amp; !state.filechat.uploadProgress"
-      class="tw flex-1 justify-center items-center flex"
+      wf-if="state.filetalk.view === 'upload' &amp;&amp; !state.filetalk.uploadProgress"
+      class="tw flex-1 justify-center items-center flex flex-col gap-4"
     >
       <button
-        wf-onclick="post('filechat.upload')"
+        wf-onclick="post('filetalk.upload')"
         class="tw outline-none group cursor-pointer p-32"
       >
         <div class="tw relative inline-block">
@@ -62,119 +66,172 @@
         </div>
       </button>
       <button
-        wf-if="state.filechat.list.length"
-        wf-onclick="post('filechat.changeView', 'dashboard')"
-        class="tw px-6 py-2 rounded-md bg-purple-400 text-white fixed right-10 top-10 hover:bg-pink-400 shadow-md hover:shadow-lg transition-all text-sm outline-none"
+        wf-if="state.filetalk.list.length"
+        wf-onclick="post('filetalk.changeView', 'dashboard')"
+        class="tw px-6 py-2 rounded-md bg-purple-400 text-white right-10 top-10 shadow-md hover:shadow-lg transition-all text-sm outline-none hover:bg-pink-400 lg:absolute"
       >
         Dashboard
       </button>
     </div>
     <div
       class="tw flex justify-center items-center flex-col gap-6 flex-1"
-      wf-if="state.filechat.view === 'upload' &amp;&amp; state.filechat.uploadProgress"
+      wf-if="state.filetalk.view === 'upload' &amp;&amp; state.filetalk.uploadProgress"
     >
-      <div class="w-96 tw rounded-full overflow-hidden bg-gray-200 h-3">
+      <div class="tw rounded-full overflow-hidden bg-gray-200 h-3 mx-8 w-72">
         <div
           class="w-32 tw bg-purple-500 h-full min-h-0! transition-all duration-2000"
-          wf-class="{{replaces w-32: `w-[${state.filechat.uploadProgress}%]`}} {{replaces bg-purple-500 duration-2000: state.filechat.uploadProgress < 100 ? 'bg-purple-500 duration-2000' : 'bg-pink-400'}}"
+          wf-class="{{replaces w-32: `w-[${state.filetalk.uploadProgress}%]`}} {{replaces bg-purple-500 duration-2000: state.filetalk.uploadProgress < 100 ? 'bg-purple-500 duration-2000' : 'bg-pink-400'}}"
         ></div>
       </div>
 
       <div
-        wf-class="{{replaces text-purple-600: state.filechat.uploadProgress < 100 ? 'text-purple-600' : 'text-pink-400'}}"
+        wf-class="{{replaces text-purple-600: state.filetalk.uploadProgress < 100 ? 'text-purple-600' : 'text-pink-400'}}"
         class="text-sm text-purple-600 tw transition-colors"
       >
-        {{state.filechat.uploadProgress &lt; 100 ? 'Uploading...' : 'Done!'}}
+        {{state.filetalk.uploadProgress &lt; 100 ? 'Uploading...' : 'Done!'}}
       </div>
     </div>
     <div
       class="tw flex flex-1 flex-col min-h-96 max-h-screen overflow-hidden"
-      wf-if="state.filechat.view === 'dashboard'"
+      wf-if="state.filetalk.view === 'dashboard'"
     >
       <div class="bu navbar tw border-b border-black/10 gap-2! bg-purple-400">
         <div class="bu navbar-brand wf-autogen">
           <div class="bu navbar-item">
-            <span class="tw font-bold tracking-widest text-white pl-2"
-              >File Chat</span
+            <span
+              class="tw font-bold tracking-widest text-white pl-2 relative top-[2px] lg:top-px"
+              >File Talk</span
             >
-          </div>
-          <div class="bu navbar-burger wf-autogen">
-            <span></span><span></span><span></span><span></span>
-          </div>
-        </div>
-        <div class="bu navbar-menu">
-          <div class="bu navbar-start">
-            <a
-              class="bu navbar-item tw bg-purple-600/20! hover:bg-purple-600/40! active:bg-purple-600/70!"
-            >
-              <span class="tw text-white">Explore</span>
-            </a>
-            <a class="bu navbar-item wf-autogen">
-              <span class="tw text-white">Archive</span>
-            </a>
-            <a
-              wf-onclick="post('filechat.changeView', 'upload')"
-              class="bu navbar-item wf-autogen"
-            >
-              <span class="tw text-white">Upload</span>
-            </a>
             <div
-              class="tw flex justify-center items-center px-3"
-              wf-if="state.filechat.loading > 0"
+              class="tw items-center flex lg:hidden"
+              wf-if="state.filetalk.loading > 0"
             >
               <img
                 src="../media/loading.svg"
-                class="w-8 tw hue-rotate-70 opacity-90"
+                class="w-8 tw relative top-[2px]"
               />
             </div>
           </div>
+          <div
+            wf-onclick="post('filetalk.toggleMenu')"
+            wf-class="{{state.filetalk.openMenu &amp;&amp; 'is-active'}}"
+            class="bu navbar-burger wf-autogen tw mr-2 hover:bg-black/20! relative top-px *:bg-purple-700!"
+          >
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div
+          wf-class="{{state.filetalk.openMenu &amp;&amp; 'is-active'}}"
+          class="bu navbar-menu tw bg-purple-400!"
+        >
+          <div class="bu navbar-start">
+            <a
+              wf-onclick="post('filetalk.toggleSubview', 'explore')"
+              class="tw bu navbar-item"
+            >
+              <span class="tw text-white relative lg:top-px">Explore</span>
+            </a>
+            <a
+              wf-onclick="post('filetalk.toggleSubview', 'archive')"
+              wf-class="{{state.filetalk.subview === 'archive' &amp;&amp; 'bg-purple-600/20! hover:bg-purple-600/40! active:bg-purple-600/70!'}}"
+              class="tw bu navbar-item"
+              hidden=""
+            >
+              <span class="tw text-white">Archive</span>
+            </a>
+
+            <a
+              wf-onclick="post('filetalk.changeView', 'upload')"
+              class="bu navbar-item wf-autogen"
+            >
+              <span class="tw text-white relative lg:top-px">Upload</span>
+            </a>
+            <div
+              class="tw items-center px-3 hidden lg:flex"
+              wf-if="state.filetalk.loading > 0"
+            >
+              <img
+                src="../media/loading.svg"
+                class="w-8 tw relative lg:top-px"
+              />
+            </div>
+          </div>
+
           <div class="bu navbar-end">
-            <a class="bu navbar-item wf-autogen">
-              <span class="tw text-white px-2">Settings</span>
+            <a
+              wf-onclick="post('filetalk.toggleAutoassist', event)"
+              class="bu navbar-item wf-autogen relative tw flex!"
+            >
+              <span class="tw text-white ml-1">Voice Assistant</span>
+              <div
+                class="tw relative items-center cursor-pointer h-min flex top-px mr-1"
+              >
+                <input
+                  type="checkbox"
+                  class="tw peer hidden"
+                  wf-checked="(state.filetalk.autoassist)"
+                  wf-onclick="post('filetalk.toggleAutoassist', event)"
+                />
+                <div
+                  class="tw w-11 rounded-full bg-black/50 h-6 scale-80 peer-checked:bg-purple-600"
+                ></div>
+                <div
+                  class="tw absolute top-1 bg-white rounded-full transition-transform w-4 h-4 scale-90 left-1.5 peer-checked:translate-x-4"
+                ></div>
+              </div>
             </a>
           </div>
         </div>
       </div>
+
       <div class="tw flex-1 flex">
         <div></div>
         <div
-          class="w-72 tw bg-gray-100 border-r border-black/10 p-4 flex flex-col gap-2 text-purple-600"
+          wf-class="{{replaces hidden: state.filetalk.openList ? 'flex' : 'hidden'}}"
+          class="tw bg-gray-100 border-black/10 p-4 flex-col gap-2 text-purple-600 sm:flex sm:border-r hidden w-screen sm:w-72"
         >
           <a
             href="#"
-            class="tw flex items-center rounded outline-none py-1 justify-between px-2 ml-[0rem] transition-colors hover:text-purple-600 gap-1.5 hover:bg-gray-200 cursor-pointer"
-            wf-map="x of state.filechat.list"
-            wf-onclick="post('filechat.select', x)"
+            class="tw flex items-center rounded outline-none py-1 justify-between px-2 ml-[0rem] transition-colors hover:text-purple-600 gap-1.5 hover:bg-gray-200 cursor-pointer max-w-[calc(100vw_-_3rem)]"
+            wf-map="x of state.filetalk.list"
+            wf-onclick="post('filetalk.select', x)"
           >
-            <div class="tw max-w-[calc(100%_-_5rem)] flex items-center gap-1.5">
-              <div class="tw nf p-2 nf-fa-file"></div>
-              <div class="tw FilesPanel-fileName overflow-hidden text-ellipsis">
-                {{x}}
-              </div>
+            <div class="tw flex items-center gap-1.5 max-w-[calc(100%_-_5rem)]">
+              <div
+                wf-class="{{replaces nf-fa-file: state.filetalk.tempfiles[x] ? 'text-pink-500 nf-md-file_question' : 'nf-fa-file'}}"
+                class="tw nf p-2 nf-fa-file"
+              ></div>
+
+              <div class="tw FilesPanel-fileName truncate">{{x}}</div>
             </div>
             <div class="tw flex">
               <button
                 class="tw outline-none nf p-2 nf-fa-pencil"
-                wf-onclick="post('filechat.rename', event, x))"
+                wf-onclick="post('filetalk.rename', event, x))"
               ></button
               ><button
                 class="tw outline-none nf p-2 nf-fa-trash"
-                wf-onclick="post('filechat.rm', event, x)"
+                wf-onclick="post('filetalk.rm', event, x)"
               ></button>
             </div>
           </a>
         </div>
-        <div
-          wf-class="{{state.filechat.media &amp;&amp; 'bg-neutral-900'}}"
-          class="flex-1 tw flex justify-center items-center overflow-hidden"
-          id="Canvas"
-        ></div>
 
         <div
-          class="tw flex-1 p-4 prose"
-          id="Markdown"
-          wf-if="state.filechat.current?.endsWith?.('.md')"
-        ></div>
+          wf-class="{{replaces hidden: !state.filetalk.openList ? 'flex' : 'hidden'}}"
+          class="tw flex-1 hidden sm:flex"
+        >
+          <div
+            wf-class="{{state.filetalk.media &amp;&amp; 'bg-neutral-900'}}"
+            class="flex-1 tw justify-center items-center overflow-hidden flex"
+            id="Canvas"
+          ></div>
+          <div
+            class="tw flex-1 p-4 prose"
+            id="Markdown"
+            wf-if="state.filetalk.current?.endsWith?.('.md')"
+          ></div>
+        </div>
       </div>
     </div>
   </body>
