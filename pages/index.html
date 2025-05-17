@@ -96,7 +96,7 @@
       wf-if="state.filetalk.view === 'dashboard'"
     >
       <div class="bu navbar tw border-b border-black/10 gap-2! bg-purple-400">
-        <div class="bu navbar-brand wf-autogen">
+        <div class="bu navbar-brand">
           <div class="bu navbar-item">
             <span
               class="tw font-bold tracking-widest text-white pl-2 relative top-[2px] lg:top-px"
@@ -115,7 +115,7 @@
           <div
             wf-onclick="post('filetalk.toggleMenu')"
             wf-class="{{state.filetalk.openMenu &amp;&amp; 'is-active'}}"
-            class="bu navbar-burger wf-autogen tw mr-2 hover:bg-black/20! relative top-px *:bg-purple-700!"
+            class="bu navbar-burger tw mr-2 hover:bg-black/20! relative top-px *:bg-purple-700!"
           >
             <span></span><span></span><span></span><span></span>
           </div>
@@ -142,7 +142,7 @@
 
             <a
               wf-onclick="post('filetalk.changeView', 'upload')"
-              class="bu navbar-item wf-autogen"
+              class="bu navbar-item"
             >
               <span class="tw text-white relative lg:top-px">Upload</span>
             </a>
@@ -160,7 +160,7 @@
           <div class="bu navbar-end">
             <a
               wf-onclick="post('filetalk.toggleAutoassist', event)"
-              class="bu navbar-item wf-autogen relative tw flex!"
+              class="bu navbar-item relative tw flex!"
             >
               <span class="tw text-white ml-1">Voice Assistant</span>
               <div
@@ -226,6 +226,7 @@
             class="flex-1 tw justify-center items-center overflow-hidden flex"
             id="Canvas"
           ></div>
+
           <div
             class="tw flex-1 p-4 prose"
             id="Markdown"
